@@ -178,8 +178,6 @@ function settings_page_content()
 	$payment_methods = unserialize(PAYMENT_METHODS);
 	if (isset($_POST['credentials']) && count($_POST['credentials'])) {
 		foreach ($payment_methods as $payment_method) {
-			print_r('ins_calc_' . $payment_method . '_credentials');
-			print_r(serialize($_POST['credentials'][$payment_method]));
 			update_option('ins_calc_' . $payment_method . '_credentials', serialize($_POST['credentials'][$payment_method]));
 			update_option('ins_calc_' . $payment_method . '_installments', serialize($_POST[$payment_method . '_installments']));
 		}
