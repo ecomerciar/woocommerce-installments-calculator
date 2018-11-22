@@ -69,7 +69,14 @@ function print_payment_methods()
 function print_pm_cfg_credentials()
 {
 	$payment_methods = unserialize(PAYMENT_METHODS);
-	$previous_config = unserialize(get_option('ins_calc_payment_methods_credentials'));
+	$previous_config = array();
+	foreach ($payment_methods as $payment_method) {
+		$opt = unserialize(get_option('ins_calc_' . $payment_method . '_credentials'));
+		if ($opt) {
+			$previous_config[$payment_method]['username'] = $opt['username'];
+			$previous_config[$payment_method]['password'] = $opt['password'];
+		}
+	}
 	if ($payment_methods && count($payment_methods) > 0) {
 		echo '<table class="widefat">';
 		foreach ($payment_methods as $payment_method) {
@@ -97,7 +104,10 @@ function print_pm_cfg_checks()
 		echo '</tr></thead>';
 		echo '<tr>';
 		foreach ($payment_methods as $payment_method) {
-			echo '<td style="text-align: center; width: 20%"><input type="checkbox" name="manual_config[]" value="' . $payment_method . '" ' . (in_array($payment_method, $previous_config) ? 'checked="checked"' : '') . '"></td>';
+			if ($previous_config)
+				echo '<td style="text-align: center; width: 20%"><input type="checkbox" name="manual_config[]" value="' . $payment_method . '" ' . (in_array($payment_method, $previous_config) ? 'checked="checked"' : '') . '"></td>';
+			else
+				echo '<td style="text-align: center; width: 20%"><input type="checkbox" name="manual_config[]" value="' . $payment_method . '"></td>';
 		}
 		echo '</tr>';
 		echo '</table>';
@@ -168,6 +178,8 @@ function settings_page_content()
 	$payment_methods = unserialize(PAYMENT_METHODS);
 	if (isset($_POST['credentials']) && count($_POST['credentials'])) {
 		foreach ($payment_methods as $payment_method) {
+			print_r('ins_calc_' . $payment_method . '_credentials');
+			print_r(serialize($_POST['credentials'][$payment_method]));
 			update_option('ins_calc_' . $payment_method . '_credentials', serialize($_POST['credentials'][$payment_method]));
 			update_option('ins_calc_' . $payment_method . '_installments', serialize($_POST[$payment_method . '_installments']));
 		}

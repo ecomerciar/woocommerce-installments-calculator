@@ -2,7 +2,7 @@ jQuery(function () {
 
     jQuery('#installments-calculator').accordion({
         collapsible: true,
-        active: false,
+        active: 0,
         heightStyle: 'content'
     });
 
@@ -16,7 +16,7 @@ jQuery(function () {
         var data = {
             'action': 'ic_check_card',
             'card_selected': this.value,
-            'product_id': jQuery('.product-main .product-summary button[name="add-to-cart"]').attr('value'),
+            'product_id': ajax_object.product_id,
             'payment_method': 'mercadopago'
         };
 
@@ -60,7 +60,7 @@ jQuery(function () {
             'action': 'ic_check_bank',
             'card_selected': jQuery('#mercadopago_installments_calculator_cards').find(":selected").attr('value'),
             'bank_selected': this.value,
-            'product_id': jQuery('.product-main .product-summary button[name="add-to-cart"]').attr('value'),
+            'product_id': ajax_object.product_id,
             'payment_method': 'mercadopago'
         };
 

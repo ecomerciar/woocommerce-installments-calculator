@@ -16,13 +16,12 @@ function add_calculator()
         return false;
     }
     $payment_methods_titles = get_titles($payment_methods);
-    echo '<h5>Calculá tus cuotas</h5>';
     echo '<div id="installments-calculator">';
     foreach ($payment_methods as $payment_method) {
         if ($payment_method === 'mercadopago') {
             $module = new Mercadopago;
         }
-        echo '<h3>' . $payment_methods_titles[$payment_method] . '</h3>';
+        echo '<h3> Calculá tus cuotas de ' . $payment_methods_titles[$payment_method] . '</h3>';
         echo '<div>';
         print_cards_select($module, $payment_method, $product);
         print_banks_select($payment_method);
@@ -37,9 +36,10 @@ function add_calculator()
 
 function add_calculator_files()
 {
-    wp_enqueue_script('calculator.js', plugin_dir_url(__FILE__) . 'js/calculator.js', array('jquery', 'jquery-ui-core', 'jquery-ui-accordion'), 1.3, true);
+    global $post;
+    wp_enqueue_script('calculator.js', plugin_dir_url(__FILE__) . 'js/calculator.js', array('jquery', 'jquery-ui-core', 'jquery-ui-accordion'), '', true);
     wp_enqueue_style('calculator.css', plugin_dir_url(__FILE__) . 'css/calculator.css', array(), 1.4);
-    wp_localize_script('calculator.js', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php')));
+    wp_localize_script('calculator.js', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php'), 'product_id' => $post->ID));
 }
 
 function print_cards_select($module, $payment_method = '', $product)
@@ -88,6 +88,8 @@ function check_card()
     $card_selected = strip_tags($_POST['card_selected']);
     $payment_method = strip_tags($_POST['payment_method']);
     $product = wc_get_product($_POST['product_id']);
+    //if (!$product) wp_send_json_error(array('msg' => 'Couldn\'t retreive product'));
+    if (!$product) wp_send_json_error(array('msg' => print_r($_POST, true)));
     $price = $product->get_price();
     if ($payment_method === 'mercadopago') {
         $module = new Mercadopago;
