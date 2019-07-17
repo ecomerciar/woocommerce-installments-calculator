@@ -49,6 +49,22 @@ function init_settings()
 		'ecom_installments_calculator'
 	);
 
+	add_settings_field(
+		'payment_methods_color',
+		__('Color principal', 'installments_calculator'),
+		__NAMESPACE__ . '\print_pm_cfg_color',
+		'installments_calculator_settings',
+		'ecom_installments_calculator'
+	);
+
+	add_settings_field(
+		'payment_methods_info',
+		__('Info', 'installments_calculator'),
+		__NAMESPACE__ . '\print_pm_cfg_info',
+		'installments_calculator_settings',
+		'ecom_installments_calculator'
+	);
+
 }
 
 
@@ -146,6 +162,18 @@ function print_pm_cfg_installments()
 	}
 }
 
+function print_pm_cfg_color()
+{
+	$payment_methods = unserialize(PAYMENT_METHODS);
+	$previous_config = get_option('ins_calc_payment_methods_color', '');
+	echo '<input type="text" name="color_config" placeholder="#FFFFFF" value="' . $previous_config . '">';
+}
+
+function print_pm_cfg_info()
+{
+	echo 'Agregá la calculadora donde quieras usando el shortcode [ecomerciar_woocommerce_installments_calculator]';
+}
+
 function create_menu_option()
 {
 	add_options_page(
@@ -172,6 +200,11 @@ function settings_page_content()
 	// Save checkboxes
 	if (isset($_POST['manual_config']) && count($_POST['manual_config'])) {
 		update_option('ins_calc_payment_methods_manual_cfg', serialize($_POST['manual_config']));
+	}
+
+	// Save Color
+	if (isset($_POST['color_config']) && count($_POST['color_config'])) {
+		update_option('ins_calc_payment_methods_color', $_POST['color_config']);
 	}
 
 	// Save credentials and installments

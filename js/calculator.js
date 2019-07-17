@@ -1,7 +1,7 @@
 jQuery(function () {
 
     jQuery('#installments-calculator').accordion({
-        collapsible: true,
+        collapsible: false,
         active: 0,
         heightStyle: 'content'
     });

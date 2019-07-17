@@ -16,57 +16,70 @@ function add_calculator()
         return false;
     }
     $payment_methods_titles = get_titles($payment_methods);
-    echo '<div id="installments-calculator">';
+    $output = '<div id="installments-calculator">';
     foreach ($payment_methods as $payment_method) {
         if ($payment_method === 'mercadopago') {
             $module = new Mercadopago;
         }
-        echo '<h3> Calculá tus cuotas de ' . $payment_methods_titles[$payment_method] . '</h3>';
-        echo '<div>';
-        print_cards_select($module, $payment_method, $product);
-        print_banks_select($payment_method);
-        print_installments_select($payment_method);
-        echo '<h5 id="installments_message"></h5>';
-        echo '</div>';
+        $output .= '<h3> Calculá tus cuotas de ' . $payment_methods_titles[$payment_method] . '</h3>';
+        $output .= '<div>';
+        $output .= print_cards_select($module, $payment_method, $product);
+        $output .= print_banks_select($payment_method);
+        $output .= print_installments_select($payment_method);
+        $output .= '<h5 id="installments_message"></h5>';
+        $output .= '</div>';
     }
-    echo '</div>';
+    $output .= '</div>';
+
+    $main_color = get_option('ins_calc_payment_methods_color', '');
+    $output .= '<style>';
+    $output .= 'h3.ui-state-active{border:1px solid ' . $main_color . ';background:' . $main_color . '}';
+    $output .= '</style>';
 
     add_calculator_files();
+
+    return $output;
 }
 
 function add_calculator_files()
 {
     global $post;
     wp_enqueue_script('calculator.js', plugin_dir_url(__FILE__) . 'js/calculator.js', array('jquery', 'jquery-ui-core', 'jquery-ui-accordion'), '', true);
-    wp_enqueue_style('calculator.css', plugin_dir_url(__FILE__) . 'css/calculator.css', array(), 1.4);
+    wp_enqueue_style('calculator.css', plugin_dir_url(__FILE__) . 'css/calculator.css', array(), "1.4.3");
     wp_localize_script('calculator.js', 'ajax_object', array('ajax_url' => admin_url('admin-ajax.php'), 'product_id' => $post->ID));
 }
 
 function print_cards_select($module, $payment_method = '', $product)
 {
-    echo '<select id="' . $payment_method . '_installments_calculator_cards">';
-    echo '<option value="nothing">Tarjeta</option>';
+    $output = '';
+    $output .= '<select id="' . $payment_method . '_installments_calculator_cards">';
+    $output .= '<option value="nothing">Tarjeta</option>';
     foreach ($module->get_cards() as $card) {
         $price = $product->get_price();
         if ($price >= $card['min_amount'] && $price <= $card['max_amount']) {
-            echo '<option value="' . $card['id'] . '">' . $card['name'] . '</option>';
+            $output .= '<option value="' . $card['id'] . '">' . $card['name'] . '</option>';
         }
     }
-    echo '</select>';
+    $output .= '</select>';
+    return $output;
 }
 
 function print_banks_select($payment_method)
 {
-    echo '<select id="' . $payment_method . '_installments_calculator_banks">';
-    echo '<option value="nothing">Banco</option>';
-    echo '</select>';
+    $output = '';
+    $output .= '<select id="' . $payment_method . '_installments_calculator_banks">';
+    $output .= '<option value="nothing">Banco</option>';
+    $output .= '</select>';
+    return $output;
 }
 
 function print_installments_select($payment_method)
 {
-    echo '<select id="' . $payment_method . '_installments_calculator_installments">';
-    echo '<option value="nothing">Cuotas</option>';
-    echo '</select>';
+    $output = '';
+    $output .= '<select id="' . $payment_method . '_installments_calculator_installments">';
+    $output .= '<option value="nothing">Cuotas</option>';
+    $output .= '</select>';
+    return $output;
 }
 
 function get_titles($payment_methods = array())
